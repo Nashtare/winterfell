@@ -20,6 +20,10 @@ name = "hash"
 harness = false
 
 [[bench]]
+name = "tip"
+harness = false
+
+[[bench]]
 name = "merkle"
 harness = false
 required-features = ["concurrent"]

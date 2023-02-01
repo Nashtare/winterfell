@@ -575,7 +575,7 @@ const fn mont_red_var(x: u128) -> u64 {
 
 /// Montgomery reduction (constant time)
 #[inline(always)]
-const fn mont_red_cst(x: u128) -> u64 {
+pub const fn mont_red_cst(x: u128) -> u64 {
     // See reference above for a description of the following implementation.
     let xl = x as u64;
     let xh = (x >> 64) as u64;
