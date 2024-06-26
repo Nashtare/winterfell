@@ -1,15 +1,12 @@
-name: Checking PR
+name: PR check
 
 on:
-  pull_request_target:
-    types:
-      - opened
-      - edited
-      - synchronize
+  pull_request:
+    types: [opened, repoened, synchronize]
 
 jobs:
   pr_check:
-    name: PR Check
+    name: Validate PR
     runs-on: ubuntu-latest
     if: github.event.pull_request.author_association != 'CONTRIBUTOR' &&
       github.event.pull_request.author_association != 'MEMBER'
