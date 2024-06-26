@@ -18,3 +18,5 @@ jobs:
         id: check
       - run: echo "Close PR"
         if: ${{ success() && steps.check.conclusion == 'failure' }}
+        steps:
+          - run: gh pr close
