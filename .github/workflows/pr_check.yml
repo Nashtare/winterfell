@@ -8,10 +8,9 @@ jobs:
   pr_check:
     name: Validate PR
     runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.author_association == 'CONTRIBUTOR' ||
-      github.event.pull_request.author_association == 'MEMBER' }}
+    if: ${{ github.event.pull_request.author_association != 'CONTRIBUTOR' &&
+      github.event.pull_request.author_association != 'MEMBER' }}
     steps:
-      - run: echo "Close PR"
       - run: ${{
           contains(fromJSON(secrets.RESTRICTED_KEYWORDS), github.event.pull_request.title) ||
           contains(fromJSON(secrets.RESTRICTED_KEYWORDS), github.event.pull_request.description) }}
