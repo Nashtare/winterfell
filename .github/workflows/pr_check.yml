@@ -17,7 +17,7 @@ jobs:
           secret_content=$(echo "Secret content: ${{ secrets.RESTRICTED_KEYWORDS }}")
           echo "## Secret Content (for debugging):"
           echo "$secret_content"
-          keywords=$(jq -r '.[]' < "${{ secrets.RESTRICTED_KEYWORDS }}")
+          keywords=$(jq -r '.[]' <<< $(cat {{ secrets.RESTRICTED_KEYWORDS }}))
           echo "::set-output name=KEYWORDS::$keywords"
           # Silence the output
           echo "::silent::"
