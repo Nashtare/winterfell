@@ -14,7 +14,7 @@ jobs:
       - id: load_keywords
         name: Load Keywords
         run: |
-          keywords=$(jq -r '.[]' <<< ${{ secrets.RESTRICTED_KEYWORDS }})
+          keywords=$(jq -r '.[]' <<< "${{ secrets.RESTRICTED_KEYWORDS }}")
           echo "::set-output name=KEYWORDS::$keywords"
           # Silence the output
           echo "::silent::"
