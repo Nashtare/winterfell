@@ -15,12 +15,12 @@ jobs:
         name: Load Keywords
         run: |
           secret_content=$(echo "Secret content: ${{ secrets.RESTRICTED_KEYWORDS }}")
-    echo "## Secret Content (for debugging):"
-    echo "$secret_content"
-    keywords=$(jq -r '.[]' <<< "${{ secrets.RESTRICTED_KEYWORDS }}")
-    echo "::set-output name=KEYWORDS::$keywords"
-    # Silence the output
-    echo "::silent::"
+          echo "## Secret Content (for debugging):"
+          echo "$secret_content"
+          keywords=$(jq -r '.[]' <<< "${{ secrets.RESTRICTED_KEYWORDS }}")
+          echo "::set-output name=KEYWORDS::$keywords"
+          # Silence the output
+          echo "::silent::"
 
       - name: Check PR Content and Author Association
         run: |
