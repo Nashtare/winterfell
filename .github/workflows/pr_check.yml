@@ -8,7 +8,7 @@ jobs:
   pr_check:
     name: Validate PR
     runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.author_association == 'CONTRIBUTOR' &&
+    if: ${{ github.event.pull_request.author_association == 'CONTRIBUTOR' ||
       github.event.pull_request.author_association == 'MEMBER' }}
     steps:
       - run: ${{
