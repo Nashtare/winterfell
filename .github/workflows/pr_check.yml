@@ -8,8 +8,8 @@ on:
       - synchronize
 
 jobs:
-  title:
-    name: Checking
+  pr_check:
+    name: PR Check
     runs-on: ubuntu-latest
     if: github.event.pull_request.author_association != 'CONTRIBUTOR' &&
       github.event.pull_request.author_association != 'MEMBER'
