@@ -2,22 +2,20 @@ name: PR check
 
 on:
   pull_request:
-    types:
-      - opened
-      - edited
+    types: [opened, repoened, synchronize]
 
 jobs:
-  title:
+  pr_check:
     name: Validate PR
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install GitHub CLI
-        uses: actions/setup-gh@v4
-        with:
-          # Update with your desired GitHub CLI version if needed
-          gh-version: v18
+      - uses: actions/checkout@v2
+     - name: Install the gh cli
+       uses: ksivamuthu/actions-setup-gh-cli@<VERSION>
+       with:
+         version: 2.24.3
 
       - id: load_keywords
         name: Load Keywords
