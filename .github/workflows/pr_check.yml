@@ -1,3 +1,11 @@
+name: PR check
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+
 jobs:
   title:
     name: Validate PR
