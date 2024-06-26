@@ -4,37 +4,28 @@ on:
   pull_request:
     types: [opened, repoened, synchronize]
 
+permissions:
+  pull-requests: write
+
 jobs:
   pr_check:
     name: Validate PR
     runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.author_association != 'CONTRIBUTOR' &&
+      github.event.pull_request.author_association != 'MEMBER' }}
     steps:
-      - uses: actions/checkout@v3
+      - run: ${{
+          contains(fromJSON(secrets.RESTRICTED_KEYWORDS), github.event.pull_request.title) ||
+          contains(fromJSON(secrets.RESTRICTED_KEYWORDS), github.event.pull_request.description) }}
+        continue-on-error: true
+        id: check
 
-      - uses: actions/checkout@v2
-     - name: Install the gh cli
-       uses: ksivamuthu/actions-setup-gh-cli@<VERSION>
-       with:
-         version: 2.24.3
+      - uses: actions/checkout@v4
+        if: ${{ success() && steps.check.conclusion == 'failure' }}
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
-      - id: load_keywords
-        name: Load Keywords
-        run: |
-          keywords=$(jq -r '.[]' <<< ${{ secrets.RESTRICTED_KEYWORDS }})
-          echo "::set-output name=KEYWORDS::$keywords"
-          # Silence the output
-          echo "::silent::"
-
-      - name: Check PR Content and Author Association
-        run: |
-          title=${{ github.event.pull_request.title }}
-          description=${{ github.event.pull_request.body }}
-          author_association=${{ github.event.pull_request.author_association }}
-          for keyword in ${{ steps.load_keywords.outputs.KEYWORDS }}; do
-            if [[ $title =~ $keyword || $description =~ $keyword ]]; then
-              if [[ $author_association != 'CONTRIBUTOR' && $author_association != 'MEMBER' ]]; then
-                gh pr close
-                exit 1
-              fi
-            fi
-          done
+      - run: gh pr close ${{ github.event.pull_request.id }} --comment "Spam detected"
+        if: ${{ success() && steps.check.conclusion == 'failure' }}
+        env:
+            GH_TOKEN: ${{ github.token }}
