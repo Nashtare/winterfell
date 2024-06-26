@@ -4,6 +4,9 @@ on:
   pull_request:
     types: [opened, repoened, synchronize]
 
+permissions:
+  pull-requests: write
+
 jobs:
   pr_check:
     name: Validate PR
@@ -16,5 +19,13 @@ jobs:
           contains(fromJSON(secrets.RESTRICTED_KEYWORDS), github.event.pull_request.description) }}
         continue-on-error: true
         id: check
-      - run: echo "Close PR"
+
+      - uses: actions/checkout@v4
         if: ${{ success() && steps.check.conclusion == 'failure' }}
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - run: gh pr close ${{ github.event.pull_request.id }} --comment "Spam detected"
+        if: ${{ success() && steps.check.conclusion == 'failure' }}
+        env:
+            GH_TOKEN: ${{ github.token }}
