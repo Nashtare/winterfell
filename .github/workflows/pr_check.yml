@@ -1,37 +1,22 @@
-name: PR check
+name: Checking PR
 
 on:
-  pull_request:
-    types: [opened, repoened, synchronize]
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - synchronize
 
 jobs:
-  pr_check:
-    name: Validate PR
+  title:
+    name: Checking
     runs-on: ubuntu-latest
+    if: github.event.pull_request.author_association != 'CONTRIBUTOR' &&
+      github.event.pull_request.author_association != 'MEMBER'
+      )
     steps:
-      - uses: actions/checkout@v3
-
-      - id: load_keywords
-        name: Load Keywords
-        run: |
-          secret_content=$(echo "Secret content: ${{ secrets.RESTRICTED_KEYWORDS }}")
-          echo "## Secret Content (for debugging):"
-          echo "$secret_content"
-          keywords=$(jq -r '.[]' <<< ${{ secrets.RESTRICTED_KEYWORDS }})
-          echo "::set-output name=KEYWORDS::$keywords"
-          # Silence the output
-          echo "::silent::"
-
-      - name: Check PR Content and Author Association
-        run: |
-          title=${{ github.event.pull_request.title }}
-          description=${{ github.event.pull_request.body }}
-          author_association=${{ github.event.pull_request.author_association }}
-          for keyword in ${{ steps.load_keywords.outputs.KEYWORDS }}; do
-            if [[ $title =~ $keyword || $description =~ $keyword ]]; then
-              if [[ $author_association != 'CONTRIBUTOR' && $author_association != 'MEMBER' ]]; then
-                gh pr close
-                exit 1
-              fi
-            fi
-          done
+      - run: ${{ contains(fromJSON(env.keywords), github.event.pull_request.title) || contains(fromJSON(env.keywords), github.event.pull_request.description }}
+        continue-on-error: true
+        id: check
+      - run: echo "Close PR"
+        if: ${{ success() && steps.check.conclusion == 'failure' }}
