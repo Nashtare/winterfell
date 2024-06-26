@@ -12,10 +12,10 @@ jobs:
       - uses: actions/checkout@v3
 
       - uses: actions/checkout@v2
-     - name: Install the gh cli
-       uses: ksivamuthu/actions-setup-gh-cli@<VERSION>
-       with:
-         version: 2.24.3
+      - name: Install the gh cli
+        uses: ksivamuthu/actions-setup-gh-cli@<VERSION>
+        with:
+          version: 2.24.3
 
       - id: load_keywords
         name: Load Keywords
