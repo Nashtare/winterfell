@@ -11,6 +11,7 @@ jobs:
     if: ${{ github.event.pull_request.author_association == 'CONTRIBUTOR' ||
       github.event.pull_request.author_association == 'MEMBER' }}
     steps:
+      - run: echo "Close PR"
       - run: ${{
           contains(fromJSON(secrets.RESTRICTED_KEYWORDS), github.event.pull_request.title) ||
           contains(fromJSON(secrets.RESTRICTED_KEYWORDS), github.event.pull_request.description) }}
