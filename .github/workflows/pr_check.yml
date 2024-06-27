@@ -16,20 +16,37 @@ jobs:
         id: check
         run: |
           # Read the restricted keywords from the secret
-          restricted_keywords=${{ secrets.RESTRICTED_KEYWORDS }}
+          restricted_keywords=$(echo "${{ secrets.RESTRICTED_KEYWORDS }}" | jq -r '.[]')
           
-          # Check if the title or body contains any restricted keywords
-          title_contains_forbidden_word=$(echo "$restricted_keywords" | jq -r '.[]' | grep -i -E -o "${{ github.event.pull_request.title }}" | wc -l)
-          description_contains_forbidden_word=$(echo "$restricted_keywords" | jq -r '.[]' | grep -i -E -o "${{ github.event.pull_request.body }}" | wc -l)
+          # Initialize variables to track forbidden words presence
+          title_contains_forbidden_word=false
+          description_contains_forbidden_word=false
+          
+          # Check title for forbidden words
+          for keyword in $restricted_keywords; do
+            if echo "${{ github.event.pull_request.title }}" | grep -i -q "$keyword"; then
+              title_contains_forbidden_word=true
+              break
+            fi
+          done
 
-          if [ $title_contains_forbidden_word -gt 0 ] || [ $description_contains_forbidden_word -gt 0 ]; then
-            echo "::set-output name=considered_spam::true"
+          # Check description for forbidden words
+          for keyword in $restricted_keywords; do
+            if echo "${{ github.event.pull_request.body }}" | grep -i -q "$keyword"; then
+              description_contains_forbidden_word=true
+              break
+            fi
+          done
+
+          # Set the output based on the presence of forbidden words
+          if [ "$title_contains_forbidden_word" = true ] || [ "$description_contains_forbidden_word" = true ]; then
+            echo "forbidden_word_found=true" >> $GITHUB_ENV
           else
-            echo "::set-output name=considered_spam::false"
+            echo "forbidden_word_found=false" >> $GITHUB_ENV
           fi
 
-      - name: Close PR if PR is considered spam and author is not a contributor or member
-        if: ${{ steps.check.outputs.considered_spam == 'true' && (github.event.pull_request.author_association != 'CONTRIBUTOR' && github.event.pull_request.author_association != 'MEMBER') }}
+      - name: Close PR if forbidden words are found and author is not a contributor or member
+        if: ${{ env.forbidden_word_found == 'true' && (github.event.pull_request.author_association != 'CONTRIBUTOR' && github.event.pull_request.author_association != 'MEMBER') }}
         run: gh pr close ${{ github.event.pull_request.number }} --comment "Spam detected"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
