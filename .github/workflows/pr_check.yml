@@ -19,38 +19,38 @@ jobs:
       - name: Check for spam PR
         id: check
         run: |
-          # Initialize variables to track forbidden words presence
-          title_contains_forbidden_word=false
-          description_contains_forbidden_word=false
+          # Initialize variables to track spam presence
+          title_is_spam=false
+          description_is_spam=false
           
-          # Check title for forbidden words
+          # Check title for spam
           for keyword in $RESTRICTED_KEYWORDS; do
             if echo "${{ github.event.pull_request.title }}" | grep -i -q "$keyword"; then
-              title_contains_forbidden_word=true
+              title_is_spam=true
               break
             fi
           done
 
-          # Check description for forbidden words
+          # Check description for spam
           for keyword in $RESTRICTED_KEYWORDS; do
             if echo "${{ github.event.pull_request.body }}" | grep -i -q "$keyword"; then
-              description_contains_forbidden_word=true
+              description_is_spam=true
               break
             fi
           done
 
-          # Set the output based on the presence of forbidden words
-          if [ "$title_contains_forbidden_word" = true ] || [ "$description_contains_forbidden_word" = true ]; then
-            echo "forbidden_word_found=true" >> $GITHUB_ENV
+          # Set the output based on the presence of spam
+          if [ "$title_is_spam" = true ] || [ "$description_is_spam" = true ]; then
+            echo "is_spam=true" >> $GITHUB_ENV
           else
-            echo "forbidden_word_found=false" >> $GITHUB_ENV
+            echo "is_spam=false" >> $GITHUB_ENV
           fi
 
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Close PR if forbidden words are found and author is not a contributor or member
-        if: ${{ env.forbidden_word_found == 'true' && github.event.pull_request.author_association != 'CONTRIBUTOR' && github.event.pull_request.author_association != 'MEMBER' && github.event.pull_request.author_association != 'OWNER' }}
+      - name: Close PR if spam are found and author is not a contributor or member
+        if: ${{ env.is_spam == 'true' && github.event.pull_request.author_association != 'CONTRIBUTOR' && github.event.pull_request.author_association != 'MEMBER' && github.event.pull_request.author_association != 'OWNER' }}
         run: gh pr close ${{ github.event.pull_request.number }} --comment "Spam detected"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
