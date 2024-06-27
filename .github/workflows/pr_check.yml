@@ -12,18 +12,19 @@ jobs:
     name: Validate PR
     runs-on: ubuntu-latest
     steps:
+      - name: Set up keywords
+        id: setup_keywords
+        run: echo "RESTRICTED_KEYWORDS=$(echo '${{ secrets.RESTRICTED_KEYWORDS }}' | jq -r '.[]' | tr '\n' ' ')" >> $GITHUB_ENV
+
       - name: Check for spam PR
         id: check
         run: |
-          # Read the restricted keywords from the secret
-          restricted_keywords=$(echo "${{ secrets.RESTRICTED_KEYWORDS }}" | jq -r '.[]')
-          
           # Initialize variables to track forbidden words presence
           title_contains_forbidden_word=false
           description_contains_forbidden_word=false
           
           # Check title for forbidden words
-          for keyword in $restricted_keywords; do
+          for keyword in $RESTRICTED_KEYWORDS; do
             if echo "${{ github.event.pull_request.title }}" | grep -i -q "$keyword"; then
               title_contains_forbidden_word=true
               break
@@ -31,7 +32,7 @@ jobs:
           done
 
           # Check description for forbidden words
-          for keyword in $restricted_keywords; do
+          for keyword in $RESTRICTED_KEYWORDS; do
             if echo "${{ github.event.pull_request.body }}" | grep -i -q "$keyword"; then
               description_contains_forbidden_word=true
               break
