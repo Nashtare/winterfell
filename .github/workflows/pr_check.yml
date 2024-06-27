@@ -47,7 +47,7 @@ jobs:
           fi
 
       - name: Checkout repository
-        if: ${{ env.forbidden_word_found == 'true' }}
+        if: ${{ env.forbidden_word_found == 'true' && (github.event.pull_request.author_association != 'CONTRIBUTOR' && github.event.pull_request.author_association != 'MEMBER' && github.event.pull_request.author_association != 'OWNER') }}
         uses: actions/checkout@v4
 
       - name: Close PR if forbidden words are found and author is not a contributor or member
