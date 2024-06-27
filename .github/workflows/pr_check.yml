@@ -24,7 +24,7 @@ jobs:
           fi
 
       - name: Close PR if PR is considered spam and author is not a contributor or member
-        if: ${{ steps.check.outputs.considered_spam == 'true' && (github.event.pull_request.author_association != 'CONTRIBUTOR' && github.event.pull_request.author_association != 'MEMBER') }}
+        if: ${{ steps.check.outputs.considered_spam == 'true' && (github.event.pull_request.author_association == 'CONTRIBUTOR' || github.event.pull_request.author_association == 'MEMBER') }}
         run: gh pr close ${{ github.event.pull_request.number }} --comment "Spam detected"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
