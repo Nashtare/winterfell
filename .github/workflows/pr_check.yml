@@ -47,11 +47,11 @@ jobs:
           fi
 
       - name: Checkout repository
-        if: ${{ env.forbidden_word_found == 'true' && (github.event.pull_request.author_association != 'CONTRIBUTOR' && github.event.pull_request.author_association != 'MEMBER') }}
+        if: ${{ env.forbidden_word_found == 'true' && (github.event.pull_request.author_association != 'CONTRIBUTOR' || github.event.pull_request.author_association != 'MEMBER') }}
         uses: actions/checkout@v4
 
       - name: Close PR if forbidden words are found and author is not a contributor or member
-        if: ${{ env.forbidden_word_found == 'true' && (github.event.pull_request.author_association != 'CONTRIBUTOR' && github.event.pull_request.author_association != 'MEMBER') }}
+        if: ${{ env.forbidden_word_found == 'true' && (github.event.pull_request.author_association != 'CONTRIBUTOR' || github.event.pull_request.author_association != 'MEMBER') }}
         run: gh pr close ${{ github.event.pull_request.number }} --comment "Spam detected"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
