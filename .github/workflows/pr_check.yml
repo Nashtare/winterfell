@@ -15,8 +15,13 @@ jobs:
       - name: Check for spam PR
         id: check
         run: |
-          title_contains_forbidden_word=$(echo "${{ fromJSON(secrets.RESTRICTED_KEYWORDS) }}" | grep -i -E -o "${{ github.event.pull_request.title }}" | wc -l)
-          description_contains_forbidden_word=$(echo "${{ fromJSON(secrets.RESTRICTED_KEYWORDS) }}" | grep -i -E -o "${{ github.event.pull_request.body }}" | wc -l)
+          # Read the restricted keywords from the secret
+          restricted_keywords=${{ secrets.RESTRICTED_KEYWORDS }}
+          
+          # Check if the title or body contains any restricted keywords
+          title_contains_forbidden_word=$(echo "$restricted_keywords" | jq -r '.[]' | grep -i -E -o "${{ github.event.pull_request.title }}" | wc -l)
+          description_contains_forbidden_word=$(echo "$restricted_keywords" | jq -r '.[]' | grep -i -E -o "${{ github.event.pull_request.body }}" | wc -l)
+
           if [ $title_contains_forbidden_word -gt 0 ] || [ $description_contains_forbidden_word -gt 0 ]; then
             echo "::set-output name=considered_spam::true"
           else
