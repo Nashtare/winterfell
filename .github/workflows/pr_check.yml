@@ -55,6 +55,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Test print 1
+        if: ${{ env.is_spam == 'true' }}
+        run: echo "Spam is true"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test print 2
+        if: ${{  github.event.pull_request.author_association != 'CONTRIBUTOR' || github.event.pull_request.author_association != 'MEMBER' || github.event.pull_request.author_association != 'OWNER' }}
+        run: echo "Not a member"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Close PR if spam are found and author is not a contributor or member
         if: ${{ env.is_spam == 'true' && ( github.event.pull_request.author_association != 'CONTRIBUTOR' || github.event.pull_request.author_association != 'MEMBER' || github.event.pull_request.author_association != 'OWNER') }}
         run: gh pr close ${{ github.event.pull_request.number }} --comment "Spam detected"
