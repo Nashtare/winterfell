@@ -13,7 +13,7 @@ use super::Serializable;
 /// Defines how primitive values are to be written into `Self`.
 pub trait ByteWriter: Sized {
     // REQUIRED METHODS
-    // --------------------------------------------------------------------------------------------
+    // -------------------------------------------------------------------- // tmp------------------------
 
     /// Writes a single byte into `self`.
     ///
