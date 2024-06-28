@@ -39,8 +39,6 @@ jobs:
             fi
           done
 
-          echo $title_is_spam
-
           # Set the output based on the presence of spam
           if [ "$title_is_spam" = true ] || [ "$description_is_spam" = true ]; then
             echo "is_spam=true" >> $GITHUB_ENV
@@ -48,30 +46,8 @@ jobs:
             echo "is_spam=false" >> $GITHUB_ENV
           fi
 
-          echo $is_spam
-          echo ${{ env.is_spam }}
-          echo ${{ env.is_spam == 'true' }}
-
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Test print 1
-        if: ${{ env.is_spam == 'true' }}
-        run: echo "Spam is true"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Test print 2
-        if: ${{  github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR' }}
-        run: echo "FIRST TIME CONTRIBUTOR"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Test print 3
-        if: ${{  github.event.pull_request.author_association != 'FIRST_TIME_CONTRIBUTOR' }}
-        run: echo "NOT A FIRST TIME CONTRIBUTOR"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Close PR if spam are found and author is not a contributor or member
         if: ${{ env.is_spam == 'true' && github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR' }}
