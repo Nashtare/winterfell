@@ -10,7 +10,7 @@
 #[macro_use]
 extern crate alloc;
 
-#[cfg(feature = "std")]
+#[cfg(feature = "std")] // test
 extern crate std;
 
 pub mod iterators;
