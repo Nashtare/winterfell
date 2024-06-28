@@ -62,14 +62,14 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Test print 2
-        if: ${{  github.event.pull_request.author_association != 'CONTRIBUTOR' || github.event.pull_request.author_association != 'MEMBER' || github.event.pull_request.author_association != 'OWNER' }}
-        run: echo "Not a member"
+        if: ${{  github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR' }}
+        run: echo "FIRST TIME CONTRIBUTOR"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Test print 3
-        if: ${{  github.event.pull_request.author_association == 'CONTRIBUTOR' && github.event.pull_request.author_association == 'MEMBER' && github.event.pull_request.author_association == 'OWNER' }}
-        run: echo "IS a member"
+        if: ${{  github.event.pull_request.author_association != 'FIRST_TIME_CONTRIBUTOR' }}
+        run: echo "NOT A FIRST TIME CONTRIBUTOR"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
