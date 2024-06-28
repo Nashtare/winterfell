@@ -48,7 +48,8 @@ jobs:
             echo "is_spam=false" >> $GITHUB_ENV
           fi
 
-          echo env.is_spam
+          echo $is_spam
+          echo $env.is_spam
           echo ${{ env.is_spam == 'true' }}
 
       - name: Checkout repository
