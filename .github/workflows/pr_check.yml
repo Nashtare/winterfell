@@ -49,7 +49,7 @@ jobs:
           fi
 
           echo $is_spam
-          echo $env.is_spam
+          echo ${{ env.is_spam }}
           echo ${{ env.is_spam == 'true' }}
 
       - name: Checkout repository
