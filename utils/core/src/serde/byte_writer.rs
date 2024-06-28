@@ -8,6 +8,8 @@ use super::Serializable;
 // BYTE WRITER TRAIT
 // ================================================================================================
 
+// tmp
+
 /// Defines how primitive values are to be written into `Self`.
 pub trait ByteWriter: Sized {
     // REQUIRED METHODS
